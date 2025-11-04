@@ -1,0 +1,60 @@
+        /* Thiết lập phông chữ chính */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7e5e5; /* Màu nền xanh lá cây rất nhạt */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Đảm bảo nội dung ở giữa chiếm không gian còn lại */
+        .main-content {
+            flex-grow: 1;
+            padding-top: 6rem; 
+            padding-bottom: 5rem;
+        }
+        header{
+            width: 100%;
+            height: 80px;
+        }
+        .btnHome {
+            display: flex;
+            align-items: center;
+            background-color: #34d399; /* Màu xanh lá nhạt */
+            color: white;
+            padding: 10px 15px;
+            border-radius: 9999px;
+            border: 1px solid #bebebe;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btnHome:hover {
+            background-color: #10b981; /* Màu xanh lá đậm hơn khi hover */
+            transform: scale(1.05);
+        }
+        /* Style đặc biệt cho tiêu đề Header */
+        .header-title {
+            padding-top: 10px;
+            font-family: 'Pacifico', cursive;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style cho các thẻ bài học */
+        .lesson-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(1);
+            border-left: 5px solid transparent;
+            border-color: #34d399; /* Màu xanh lá nhạt */
+        }
+        .lesson-card:hover {
+            box-shadow: 0 10px 20px -5px rgba(2, 251, 168, 0.3);
+            transform: scale(1.02);
+            border-left-color: #f8c306; /* Màu xanh đậm hơn khi hover */
+        }
+
+        /* Responsive Grid: 3 cột trên desktop, 2 cột trên tablet, 1 cột trên mobile */
+        .lesson-grid {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>An Khùng</title>
+    <!-- Tải Tailwind CSS để xây dựng giao diện nhanh và đẹp -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải phông chữ Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tải thư viện Font Awesome cho icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 1. HEADER (Thanh đầu trang) - Giống trang chủ -->
+    <header class="fixed top-0 left-0 w-full bg-white shadow-xl z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center relative">
+            <!-- Dòng chữ ở giữa --> 
+            <h1 class="header-title text-3xl font-extrabold text-green-700 absolute left-1/2 transform -translate-x-1/2">
+                An Maria</h1>
+        </div>
+    </header>
+    <!-- 2. PHẦN DANH MỤC BÀI HỌC (Body Content) -->
+    <main class="main-content flex justify-center">
+        <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-extrabold text-green-600 mb-6 text-center">
+                <i class="fa-brands fa-digital-ocean"></i> 
+                Môn học của An Maria
+            </h2>
+            <p class="text-xl text-gray-500 mb-12 text-center">
+                Chọn bài học để bắt đầu luyện tập 
+            </p>
+            <div class="lesson-grid grid gap-6">
+                <!-- Tạo vòng lặp 9 bài học (Tạo thủ công 9 thẻ để minh họa) -->
+                <a href="bai1.html" class="lesson-card bg-white p-6 rounded-xl shadow-md flex items-center space-x-4">
+                    <span class="text-3xl font-extrabold text-green-600">01</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Bài 01</h3>
+                    </div>
+                </a>
+                <a href="bai2.html" class="lesson-card bg-white p-6 rounded-xl shadow-md flex items-center space-x-4">
+                    <span class="text-3xl font-extrabold text-green-600">02</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Bài 02</h3>
+                    </div>
+                </a>
+                <a href="bai3.html" class="lesson-card bg-white p-6 rounded-xl shadow-md flex items-center space-x-4">
+                    <span class="text-3xl font-extrabold text-green-600">03</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Bài 03</h3>
+                    </div>
+                </a>
+                <a href="bai4.html" class="lesson-card bg-white p-6 rounded-xl shadow-md flex items-center space-x-4">
+                    <span class="text-3xl font-extrabold text-green-600">04</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Bài 04</h3>
+                    </div>
+                </a>
+                <a href="bai5.html" class="lesson-card bg-white p-6 rounded-xl shadow-md flex items-center space-x-4">
+                    <span class="text-3xl font-extrabold text-green-600">05</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Bài 05</h3>
+                    </div>
+                </a>
+                <a href="bai6.html" class="lesson-card bg-white p-6 rounded-xl shadow-md flex items-center space-x-4">
+                    <span class="text-3xl font-extrabold text-green-600">06</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Bài 06</h3>
+                    </div>
+                </a>
+                <a href="bai7.html" class="lesson-card bg-white p-6 rounded-xl shadow-md flex items-center space-x-4">
+                    <span class="text-3xl font-extrabold text-green-600">07</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Bài 07</h3>
+                    </div>
+                </a>
+                <a href="bai8.html" class="lesson-card bg-white p-6 rounded-xl shadow-md flex items-center space-x-4">
+                    <span class="text-3xl font-extrabold text-green-600">08</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Bài 08</h3>
+                    </div>
+                </a>
+                <a href="bai9.html" class="lesson-card bg-white p-6 rounded-xl shadow-md flex items-center space-x-4">
+                    <span class="text-3xl font-extrabold text-green-600">09</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Bài 09</h3>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </main>
+    <footer class="bg-green-600 text-white py-4 shadow-inner">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-lg font-bold tracking-wider">
+                Luyện tập vui vẻ! ✨
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

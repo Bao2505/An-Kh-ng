@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/test.css">
+</head>
+<body class="flex flex-col items-center justify-between min-h-screen bg-gray-100">
+    <header >
+        <h1 class="textheader">An Khùng</h1>
+        <button id="exit-button" class="btnExit">Thoát</button>
+        <a href="index.html" class="btnHome">
+            <i class="fa-solid fa-arrow-left" style="color: rgb(0, 0, 0); font-size: 20px; font-weight: bold; margin-left: 8px;"></i>Trang Chủ.
+        </a>
+    </header>
+    <!-- Container chính (Chia làm 2 cột trên màn hình lớn) -->
+    <div class="container mx-auto px-4 my-8 grid grid-cols-1 md:grid-cols-10 gap-8 items-start">
+        <!-- KHUNG BÊN TRÁI: NỘI DUNG CÂU HỎI (7/10 cột) -->
+        <div id="quiz-container" class="bg-white p-8 rounded-2xl shadow-xl w-full md:col-span-7">
+            <!-- Màn hình bắt đầu bài kiểm tra -->
+            <div id="start-screen" class="text-center">
+                <h1 class="text-3xl font-bold text-gray-900 mb-4">Bài 9</h1>
+                <p class="text-gray-600 mb-6">Chào mừng bạn đến với bài kiểm tra! Hãy nhấn "Bắt đầu" để bắt đầu.</p>
+                <button id="start-button" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">Bắt đầu</button>
+            </div>
+            <!-- Nội dung Quiz: Hiển thị câu hỏi và đáp án -->
+            <div id="quiz-content" class="hidden">
+                <!-- Bộ đếm câu hỏi (VD: 1/10) -->
+                <p id="question-counter" class="text-lg font-semibold text-gray-700 mb-2"></p>
+                <!-- Tiêu đề/Nội dung câu hỏi -->
+                <h2 id="question-text" class="text-xl text-gray-1500 mb-2"></h2><br>
+                <!-- Hình minh họa câu hỏi (nếu có) -->
+                <div id="question-image-container" class="mb-4 hidden">
+                    <img id="question-image" src="" alt="Minh họa câu hỏi" class="mx-auto rounded-xl shadow-lg max-h-64 object-contain">
+                </div>
+                <!-- Thông báo cho câu hỏi Multi-Select -->
+                <p id="multiselect-info" class="text-sm text-red-500 font-medium mb-4 hidden"><i>2 đáp án đúng!</i></p>
+                <!-- 1. Container cho Single/Multi-Select (Chọn đáp án) -->
+                <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <!-- Các nút đáp án được tạo bằng JavaScript -->
+                </div>
+                <!-- 2. Container cho Drag & Drop (Kéo thả) -->
+                <div id="dragdrop-container" class="hidden">
+                    <p class="text-sm text-blue-500 font-medium mb-4">Kéo thả theo ý đúng</p>
+                    <!-- Vùng kéo (Source): Chứa các thẻ chưa được thả -->
+                    <div id="draggable-items-source" class="source-drop-zone drop-zone flex flex-wrap gap-3 p-4 bg-gray-50 border rounded-xl mb-6 shadow-inner">
+                        <p class="text-gray-500 text-sm italic w-full source-placeholder">Kéo các thẻ ở đây... </p>
+                    </div>
+                    <!-- Vùng thả (Targets): Chứa các Category -->
+                    <div id="drop-targets-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    </div>
+                </div>
+                <!-- 3. Container cho Fill-in-the-Blank (Điền từ) -->
+                <div id="fill-in-the-blank-container" class="space-y-4 hidden mt-6">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input 
+                            type="text" 
+                            id="fill-in-the-blank-input" 
+                            placeholder="Nhập đáp án của bạn..." 
+                            class="flex-grow p-3 border border-gray-300 rounded-lg transition duration-150"
+                        >
+                        <button 
+                            id="check-fill-in-the-blank-button"
+                            class="check-button-enabled text-black font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 disabled:bg-gray-400"
+                            onclick="checkFillInTheBlank()"
+                        >
+                            Kiểm tra đáp án
+                        </button>
+                    </div>
+                </div>
+                <!-- Thanh điều hướng dưới cùng -->
+                <div class="flex justify-end items-center mt-6 border-t pt-4 space-x-4">
+                    <button 
+                        id="check-answer-button" 
+                        class="hidden text-black font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
+                    >
+                        Kiểm tra
+                    </button>
+                    <button 
+                        id="next-button" 
+                        class="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105"
+                    >
+                        Tiếp
+                    </button>
+                </div>
+            </div>
+            <!-- Màn hình kết quả cuối bài thi -->
+            <div id="results-screen" class="hidden text-center">
+                <h2 class="text-3xl font-bold text-green-600 mb-4">Hoàn thành bài kiểm tra!</h2>
+                <!-- HIỂN THỊ ĐIỂM SỐ ĐÃ TỐI ƯU HÓA -->
+                <div class="bg-blue-50 p-6 rounded-2xl shadow-xl inline-block mb-6">
+                    <p class="text-xl font-semibold text-gray-700">Điểm số của bạn:</p>
+                    <!-- Thẻ hiển thị điểm số cuối cùng -->
+                    <p id="final-score" class="text-6xl font-extrabold text-blue-700 mt-2">0 / 0</p>
+                </div>
+                <p id="result-message" class="text-gray-700 mb-6">Bạn có thể xem lại các câu trả lời của mình trên giao diện.</p>
+                <button id="restart-button" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">Làm lại</button>
+            </div>
+        </div>
+        <!-- KHUNG BÊN PHẢI: SIDEBAR (3/10 cột) -->
+        <div id="sidebar" class="bg-white p-6 rounded-2xl shadow-xl w-full hidden md:block md:col-span-3 sticky top-8">
+            <div class="mb-6 text-center">
+                <p class="text-xl font-semibold text-gray-700 mb-2">Thời gian làm bài:</p>
+                <!-- Đồng hồ đếm ngược/đếm thời gian -->
+                <div id="timer" class="text-4xl font-bold text-red-500">00:00</div>
+            </div>
+            <div>
+                <p class="text-lg font-semibold text-gray-700 mb-4">Danh sách câu hỏi:</p>
+                <!-- Danh sách các nút câu hỏi để nhảy qua lại -->
+                <div id="question-list-container" class="grid grid-cols-4 gap-2">
+                    <!-- Các nút câu hỏi được tạo bằng JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="w-full bg-gray-800 text-white text-center py-4 px-6 mt-auto">
+        <p class="text-sm">&copy; Website luyện tập!!!</p>
+    </footer>
+    <script>
+        let questions = [
+            // Câu 1
+            {
+                question: "Kubernetes ban đầu được phát triển bởi công ty nào?",
+                options: ["A. Microsoft", "B. IBM", "C. Red Hat", "D. Google"],
+                answer: "D. Google",
+                type: "single_select"
+            },
+            // Câu 2
+            {
+                question: "Docker đóng vai trò gì khi làm việc cùng với Kubernetes?",
+                options: [
+                    "A. Chạy các ứng dụng trực tiếp trên hệ điều hành mà không cần container",
+                    "B. Là một công cụ để thiết kế UI cho ứng dụng",
+                    "C. Đóng gói ứng dụng và môi trường phụ thuộc thành image để triển khai lên K8s",
+                    "D. Thay thế cho Scheduler trong Kubernetes"
+                ],
+                answer: "C. Đóng gói ứng dụng và môi trường phụ thuộc thành image để triển khai lên K8s",
+                type: "single_select"
+            },
+            // Câu 3
+            {
+                question: "Khi tích hợp Docker + Kubernetes vào Jenkins pipeline, ta nên làm gì trong bước cuối?",
+                options: [
+                    "A. Sử dụng Docker để tạo ảnh động cho ứng dụng",
+                    "B. Sử dụng kubectl apply để cập nhật Deployment với Docker image mới",
+                    "C. Xóa toàn bộ Pod đang chạy để giải phóng RAM",
+                    "D. Tải mã nguồn lên GitHub"
+                ],
+                answer: "B. Sử dụng kubectl apply để cập nhật Deployment với Docker image mới",
+                type: "single_select"
+            },
+            // Câu 4
+            {
+                question: "Kubernetes chạy container trên các máy chủ được gọi là gì?",
+                options: ["A. Pods", "B. Nodes", "C. Volumes", "D. Services"],
+                answer: "B. Nodes",
+                type: "single_select"
+            },
+            // Câu 5
+            {
+                question: "Lệnh nào dưới đây dùng để kiểm tra trạng thái của các Node trong cluster Kubernetes?",
+                options: [
+                    "A. kubectl get pods",
+                    "B. kubectl get nodes",
+                    "C. kubectl describe cluster",
+                    "D. kubectl start node"
+                ],
+                answer: "B. kubectl get nodes",
+                type: "single_select"
+            },
+            // Câu 6
+            {
+                question: "Kubernetes được thiết kế để chạy chủ yếu với loại ứng dụng nào sau đây?",
+                options: [
+                    "A. Ứng dụng desktop",
+                    "B. Ứng dụng container hóa",
+                    "C. Ứng dụng mobile",
+                    "D. Ứng dụng viết bằng C++"
+                ],
+                answer: "B. Ứng dụng container hóa",
+                type: "single_select"
+            },
+            // Câu 7.1
+            {
+                question: "K8s là cách viết rút gọn của 'Kubernetes', với '8' đại diện cho 8 chữ cái giữa K và s?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "A. Đúng",
+                type: "single_select"
+            },
+            // Câu 7.2
+            {
+                question: "Kubernetes được phát triển đầu tiên bởi Cloud Native Computing Foundation (CNCF) và sau đó đã được chuyển giao cho Google?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "B. Sai",
+                type: "single_select"
+            },
+            // Câu 7.3
+            {
+                question: "Mỗi Pod có thể chứa một hoặc nhiều container và được coi là đơn vị triển khai cơ bản trong Kubernetes?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "A. Đúng",
+                type: "single_select"
+            },
+            // Câu 7.4
+            {
+                question: "Với K8s, mỗi Node có thể là một máy vật lý hoặc máy ảo?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "A. Đúng",
+                type: "single_select"
+            },
+            // Câu 8.1
+            {
+                question: "DevOps thúc đẩy sự cộng tác giữa đội phát triển phần mềm và đội vận hành?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "A. Đúng",
+                type: "single_select"
+            },
+            // Câu 8.2
+            {
+                question: "Mã nguồn mở (open-source) không phù hợp với DevOps do thiếu tính bảo mật?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "B. Sai",
+                type: "single_select"
+            },
+            // Câu 8.3
+            {
+                question: "Open-source rất phù hợp với DevOps vì tính minh bạch, cộng đồng đóng góp và khả năng tích hợp tốt?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "A. Đúng",
+                type: "single_select"
+            },
+            // Câu 8.4
+            {
+                question: "Microservices cho phép các nhóm phát triển triển khai và mở rộng các dịch vụ một cách độc lập?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "A. Đúng",
+                type: "single_select"
+            },
+            // Câu 9.1
+            {
+                question: "Continuous Integration (CI) là quá trình tự động hóa kiểm thử đơn vị sau khi commit code?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "A. Đúng",
+                type: "single_select"
+            },
+            // Câu 9.2
+            {
+                question: "Trong DevOps, việc triển khai liên tục (CD) không bao gồm kiểm thử tích hợp hoặc kiểm thử tự động?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "B. Sai",
+                type: "single_select"
+            },
+            // Câu 9.3
+            {
+                question: "CD bao gồm cả kiểm thử tích hợp, kiểm thử hệ thống và triển khai hệ thống?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "A. Đúng",
+                type: "single_select"
+            },
+            // Câu 9.4
+            {
+                question: "Docker là công cụ phổ biến dùng để đóng gói từng microservice thành container?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "A. Đúng",
+                type: "single_select"
+            },
+            // Câu 10.1
+            {
+                question: "Infrastructure as Code (IaC) giúp quản lý hạ tầng như code, dễ kiểm soát và tự động hóa?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "A. Đúng",
+                type: "single_select"
+            },
+            // Câu 10.2
+            {
+                question: "Trong mô hình microservices, việc chia nhỏ ứng dụng làm tăng sự phụ thuộc giữa các nhóm phát triển?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "B. Sai",
+                type: "single_select"
+            },
+            // Câu 10.3
+            {
+                question: "Microservices bắt buộc phải được viết bằng cùng một ngôn ngữ lập trình để dễ quản lý?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "B. Sai",
+                type: "single_select"
+            },
+            // Câu 10.4
+            {
+                question: "Microservices có thể dùng đa ngôn ngữ, miễn là chúng giao tiếp qua API?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "A. Đúng",
+                type: "single_select"
+            },
+            // Câu 16
+            {
+                question: "Từ 'K8s' là viết tắt rút gọn của từ nào trong DevOps?",
+                options: ["A. Kernel Operations", "B. Kubernetes", "C. Kaptain8", "D. Kubix System"],
+                answer: "B. Kubernetes",
+                type: "single_select"
+            },
+            // Câu 17
+            {
+                question: "Mục tiêu chính của Kubernetes là gì?",
+                options: [
+                    "A. Giám sát cơ sở dữ liệu MySQL",
+                    "B. Quản lý các máy ảo trong Vmware",
+                    "C. Điều phối và quản lý container trong môi trường phân tán",
+                    "D. Cung cấp mạng không dây cho container"
+                ],
+                answer: "C. Điều phối và quản lý container trong môi trường phân tán",
+                type: "single_select"
+            },
+            // Câu 18
+            {
+                question: "Điều phối ứng dụng trong Kubernetes có nghĩa là gì?",
+                options: [
+                    "A. Chạy ứng dụng trên một máy chủ vật lý duy nhất",
+                    "B. Quản lý việc cài đặt phần mềm trên máy ảo",
+                    "C. Tự động hóa việc triển khai, mở rộng, cân bằng tải và cập nhật ứng dụng container",
+                    "D. Chỉ cho phép một container chạy tại một thời điểm"
+                ],
+                answer: "C. Tự động hóa việc triển khai, mở rộng, cân bằng tải và cập nhật ứng dụng container",
+                type: "single_select"
+            },
+            // Câu 19
+            {
+                question: "Thành phần nào trong Kubernetes chịu trách nhiệm điều phối và phân phối workload đến các Node trong cluster?",
+                options: ["A. Container", "B. PC", "C. Image", "D. Scheduler"],
+                answer: "D. Scheduler",
+                type: "single_select"
+            },
+            // Câu 20.1
+            {
+                question: "Kubernetes không thể sử dụng để triển khai kiến trúc microservices?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "B. Sai",
+                type: "single_select"
+            },
+            // Câu 20.2
+            {
+                question: "Kubernetes là nền tảng điều phối container lý tưởng cho microservices?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "A. Đúng",
+                type: "single_select"
+            },
+            // Câu 20.3
+            {
+                question: "DevOps pipeline trong dự án mã nguồn mở nên công khai toàn bộ thông tin truy cập production?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "B. Sai",
+                type: "single_select"
+            },
+            // Câu 20.4
+            {
+                question: "Bảo mật thông tin nhạy cảm trong DevOps pipeline là nguyên tắc quan trọng, cần dùng secrets hoặc encrypted storage?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "A. Đúng",
+                type: "single_select"
+            },
+            // Câu 21.1
+            {
+                question: "DevOps pipeline thường bao gồm các giai đoạn: build → test → deploy → monitor?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "A. Đúng",
+                type: "single_select"
+            },
+            // Câu 21.2
+            {
+                question: "Các công cụ CI/CD như Jenkins, GitHub Actions, GitLab CI không thể sử dụng cho dự án mã nguồn mở?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "B. Sai",
+                type: "single_select"
+            },
+            // Câu 21.3
+            {
+                question: "Trong DevOps, giám sát (monitoring) sau khi triển khai giúp phát hiện lỗi nhanh chóng?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "A. Đúng",
+                type: "single_select"
+            },
+            // Câu 21.4
+            {
+                question: "Git là công cụ không cần thiết trong quy trình DevOps?",
+                options: ["A. Đúng", "B. Sai"],
+                answer: "B. Sai",
+                type: "single_select"
+            },
+            // Câu 27
+            {
+                question: "Đâu là đơn vị triển khai nhỏ nhất trong Kubernetes dùng để chứa container?",
+                options: ["A. Image", "B. Service", "C. Node", "D. Pod"],
+                answer: "D. Pod",
+                type: "single_select"
+            },
+            // Câu 28
+            {
+                question: "Yêu cầu nào sau đây là thiết yếu để kết hợp Docker image vào quy trình CD với Kubernetes?",
+                options: [
+                    "A. Kubernetes phải chạy trên hệ điều hành Windows",
+                    "B. Pod phải được tạo từ file Word",
+                    "C. Docker image phải được đẩy lên registry và có tag version rõ ràng",
+                    "D. Image phải được nén thành file .zip để upload"
+                ],
+                answer: "C. Docker image phải được đẩy lên registry và có tag version rõ ràng",
+                type: "single_select"
+            },
+            // Câu 29
+            {
+                question: "Trong một pipeline DevOps, Docker thường được sử dụng để làm gì?",
+                options: [
+                    "A. Tạo báo cáo kiểm thử thủ công",
+                    "B. Xây dựng image chứa ứng dụng và các phụ thuộc để triển khai tự động",
+                    "C. Tạo file YAML để khai báo Kubernetes resource",
+                    "D. Quản lý truy cập người dùng vào cluster"
+                ],
+                answer: "B. Xây dựng image chứa ứng dụng và các phụ thuộc để triển khai tự động",
+                type: "single_select"
+            },
+            // Câu 30
+            {
+                question: "Trong DevOps pipeline có sử dụng Kubernetes, bước triển khai (deploy) thường được thực hiện bằng cách nào?",
+                options: [
+                    "A. Upload file lên FTP server",
+                    "B. Chạy docker run trên từng máy chủ riêng biệt",
+                    "C. Gửi code qua email để QA kiểm tra",
+                    "D. Sử dụng kubectl apply hoặc Helm để triển khai Docker image vào cluster"
+                ],
+                answer: "D. Sử dụng kubectl apply hoặc Helm để triển khai Docker image vào cluster",
+                type: "single_select"
+            },
+            // CÂU HỎI KÉO THẢ (DRAG & DROP)
+            {
+                question: "Kéo thả thông tin phù hợp vào các chỗ trống trong phát biểu sau: Trong DevOps, giai đoạn kiểm thử API có thể sử dụng công cụ __(1)__ để gửi request và kiểm tra response. Để phân tích chất lượng và độ an toàn mã nguồn, bạn sử dụng công cụ __(2)__ tích hợp vào CI pipeline.",
+                type: "drag_drop",
+                categories: ["(1)", "(2)"],
+                items: [
+                    { id: "item1", text: "Postman", correctCategory: "(1)" },
+                    { id: "item2", text: "SonarQube", correctCategory: "(2)" },
+                ]
+            },
+
+            // CÂU HỎI KÉO THẢ (DRAG & DROP)
+            {
+                question: "Kéo thả thông tin phù hợp vào các chỗ trống trong phát biểu sau: OWASP __(1)__ là công cụ kiểm tra lỗ hổng bảo mật trên ứng dụng web trong pipeline CI/CD. Để tự động hóa quy trình CI/CD, bạn sử dụng công cụ tích hợp phổ biến là __(2)__.",
+                type: "drag_drop",
+                categories: ["(1)", "(2)"],
+                items: [
+                    { id: "item1", text: "ZAP", correctCategory: "(1)" },
+                    { id: "item2", text: "Jenkins", correctCategory: "(2)" },
+                ]
+            },
+
+            // CÂU HỎI KÉO THẢ (DRAG & DROP)
+            {
+                question: "Kéo thả thông tin phù hợp vào các chỗ trống trong phát biểu sau: Jenkins lưu trữ artifact như file .jar sau bước build tại kho chứa như __(1)__. Docker được dùng trong pipeline để đóng gói từng microservice thành một __(2)__.",
+                type: "drag_drop",
+                categories: ["(1)", "(2)"],
+                items: [
+                    { id: "item1", text: "Nexus", correctCategory: "(1)" },
+                    { id: "item2", text: "image", correctCategory: "(2)" },
+                ]
+            },
+
+            // CÂU HỎI KÉO THẢ (DRAG & DROP)
+            {
+                question: "Kéo thả thông tin phù hợp vào các chỗ trống trong phát biểu sau: Trong kiến trúc microservices, mỗi service nên triển khai thành một __(1)__ độc lập trong Kubernetes. Sau mỗi lần push code mới, pipeline nên tự động chạy từ build đến deploy để đảm bảo tính __(2)__.",
+                type: "drag_drop",
+                categories: ["(1)", "(2)"],
+                items: [
+                    { id: "item1", text: "Pod", correctCategory: "(1)" },
+                    { id: "item2", text: "liên tục (continuous)", correctCategory: "(2)" },
+                ]
+            },
+
+            // CÂU HỎI KÉO THẢ (DRAG & DROP)
+            {
+                question: "Kéo thả thông tin phù hợp vào các chỗ trống trong phát biểu sau: Để đẩy Docker image lên DockerHub, Jenkins sử dụng lệnh docker __(1)__. Jenkins có thể sử dụng plugin __(2)__ để tích hợp kiểm thử bảo mật ứng dụng web vào pipeline.",
+                type: "drag_drop",
+                categories: ["(1)", "(2)"],
+                items: [
+                    { id: "item1", text: "push", correctCategory: "(1)" },
+                    { id: "item2", text: "OWASP ZAP", correctCategory: "(2)" },
+                ]
+            },
+
+            // CÂU HỎI KÉO THẢ (DRAG & DROP)
+            {
+                question: "Kéo thả thông tin phù hợp vào các chỗ trống trong phát biểu sau: Công cụ build phổ biến dùng để quản lý dependencies và đóng gói các service là __(1)__. Để kiểm thử đơn vị (unit test) trong Java, công cụ phổ biến được dùng là __(2)__.",
+                type: "drag_drop",
+                categories: ["(1)", "(2)"],
+                items: [
+                    { id: "item1", text: "Maven", correctCategory: "(1)" },
+                    { id: "item2", text: "JUnit", correctCategory: "(2)" },
+                ]
+            },
+
+            // CÂU HỎI KÉO THẢ (DRAG & DROP)
+            {
+                question: "Kéo thả thông tin phù hợp vào các chỗ trống trong phát biểu sau: Sau khi build image thành công, bước tiếp theo là push image lên registry như __(1)__. Để triển khai nhiều container microservices, công cụ điều phối thường được sử dụng là __(2)__.",
+                type: "drag_drop",
+                categories: ["(1)", "(2)"],
+                items: [
+                    { id: "item1", text: "DockerHub", correctCategory: "(1)" },
+                    { id: "item2", text: "Kubernetes", correctCategory: "(2)" },
+                ]
+            },
+
+            // CÂU HỎI KÉO THẢ (DRAG & DROP)
+            {
+                question: "Kéo thả thông tin phù hợp vào các chỗ trống trong phát biểu sau: Để đảm bảo tất cả thành phần hoạt động đúng trong môi trường staging, cần thực hiện kiểm thử __(1)__. Giám sát và cảnh báo sau khi triển khai là một phần của giai đoạn __(2)__ trong DevOps lifecycle.",
+                type: "drag_drop",
+                categories: ["(1)", "(2)"],
+                items: [
+                    { id: "item1", text: "tích hợp (integration)", correctCategory: "(1)" },
+                    { id: "item2", text: "Monitor", correctCategory: "(2)" },
+                ]
+            },
+
+            // CÂU HỎI KÉO THẢ (DRAG & DROP)
+            {
+                question: "Kéo thả thông tin phù hợp vào các chỗ trống trong phát biểu sau: Khi triển khai ứng dụng bằng Kubernetes, bạn mô tả toàn bộ cấu hình của Pod và Service bằng các file định dạng __(1)__. Trong pipeline, sau bước kiểm thử và phân tích mã, Jenkins có thể gọi lệnh docker __(2)__ để tạo image mới.",
+                type: "drag_drop",
+                categories: ["(1)", "(2)"],
+                items: [
+                    { id: "item1", text: "YAML", correctCategory: "(1)" },
+                    { id: "item2", text: "build", correctCategory: "(2)" },
+                ]
+            },
+
+            // CÂU HỎI KÉO THẢ (DRAG & DROP)
+            {
+                question: "Kéo thả thông tin phù hợp vào các chỗ trống trong phát biểu sau: Các Docker image lưu trữ artifact sau khi build nên được đẩy vào kho như __(1)__ để tái sử dụng trong deploy. Trong kiến trúc microservices, mỗi services nên có pipeline riêng, điều này giúp tăng khả năng __(2)__ và tự chủ của nhóm phát triển.",
+                type: "drag_drop",
+                categories: ["(1)", "(2)"],
+                items: [
+                    { id: "item1", text: "Nexus", correctCategory: "(1)" },
+                    { id: "item2", text: "độc lập", correctCategory: "(2)" },
+                ]
+            },
+
+        ];
+        let currentQuestionIndex = 0; // Chỉ số câu hỏi hiện tại
+        let elapsedTime = 0; // Thời gian làm bài (giây)
+        let timerInterval; // Biến lưu trữ Interval của đồng hồ
+        let answeredQuestions = new Array(questions.length).fill(null);
+        let correctnessStatus = new Array(questions.length).fill(null);
+        // Lấy các phần tử DOM cần thiết
+        const startScreen = document.getElementById('start-screen');
+        const startButton = document.getElementById('start-button');
+        const quizContent = document.getElementById('quiz-content');
+        const questionCounter = document.getElementById('question-counter');
+        const multiselectInfo = document.getElementById('multiselect-info');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const dragdropContainer = document.getElementById('dragdrop-container');
+        const draggableItemsSource = document.getElementById('draggable-items-source');
+        const dropTargetsContainer = document.getElementById('drop-targets-container');
+        const fillInTheBlankContainer = document.getElementById('fill-in-the-blank-container');
+        const fillInTheBlankInput = document.getElementById('fill-in-the-blank-input');
+        const checkFillInTheBlankButton = document.getElementById('check-fill-in-the-blank-button');
+        const checkAnswerButton = document.getElementById('check-answer-button'); // Nút kiểm tra chung (Multi-select, Drag & Drop)
+        const nextButton = document.getElementById('next-button');
+        const resultsScreen = document.getElementById('results-screen');
+        const restartButton = document.getElementById('restart-button');
+        // SỬA LỖI VÀ TÍNH ĐIỂM: Thêm các dòng này để khai báo biến DOM
+        const resultMessage = document.getElementById('result-message'); 
+        const exitButton = document.getElementById('exit-button'); 
+        const finalScore = document.getElementById('final-score'); // Thẻ hiển thị điểm số
+        
+        const sidebar = document.getElementById('sidebar');
+        const timerDisplay = document.getElementById('timer');
+        const questionListContainer = document.getElementById('question-list-container');
+        function normalizeString(str) {
+            let normalized = str.toLowerCase().trim();
+            normalized = normalized.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+            return normalized.replace(/\s+/g, '');
+        }
+        fillInTheBlankInput.onkeypress = (event) => {
+            if (event.key === 'Enter') checkFillInTheBlank();
+        };
+        function drag(event) {
+            event.dataTransfer.setData("text/plain", event.target.id);
+            event.target.classList.add('opacity-50');
+        }
+        function dragEnd(event) {
+            event.target.classList.remove('opacity-50');
+        }
+        function allowDrop(event) {
+            event.preventDefault(); // Cho phép thả
+            const target = event.target.closest('.drop-zone') || event.target.closest('.source-drop-zone');
+            if (target) {
+                target.classList.add('drag-over');
+            }
+        }
+        function dragLeave(event) {
+             const target = event.target.closest('.drop-zone') || event.target.closest('.source-drop-zone');
+            if (target) {
+                target.classList.remove('drag-over');
+            }
+        }
+        function drop(event, categoryName) {
+            event.preventDefault();
+            let targetZone = event.target.closest('.drop-zone') || event.target.closest('.source-drop-zone');
+            // Nếu đã kiểm tra (có feedback), không cho phép tương tác
+            if (!targetZone || correctnessStatus[currentQuestionIndex] !== null) return; 
+            targetZone.classList.remove('drag-over');
+            const itemId = event.dataTransfer.getData("text/plain");
+            const draggedElement = document.getElementById(itemId);
+            if (draggedElement) {
+                const oldParent = draggedElement.parentElement;
+                if (oldParent) {
+                    oldParent.removeChild(draggedElement);
+                }
+                targetZone.appendChild(draggedElement);
+                let currentAnswer = answeredQuestions[currentQuestionIndex] || {};
+                const itemText = draggedElement.textContent.trim(); 
+
+                const isDroppedBackToSource = targetZone.id === 'draggable-items-source';
+
+                if (isDroppedBackToSource) {
+                    delete currentAnswer[itemText]; 
+                } else { 
+                    currentAnswer[itemText] = categoryName;
+                }
+                answeredQuestions[currentQuestionIndex] = Object.keys(currentAnswer).length > 0 ? currentAnswer : null;
+                updateButtonStates();
+            }
+        }
+        function checkCorrectness(questionIndex, selectedAnswers) {
+            const currentQuestion = questions[questionIndex];
+            if (currentQuestion.type === "drag_drop") {
+                const droppedAnswers = selectedAnswers || answeredQuestions[questionIndex];
+                if (!droppedAnswers) return false;
+                if (Object.keys(droppedAnswers).length !== currentQuestion.items.length) {
+                    return false;
+                }
+                return currentQuestion.items.every(item => {
+                    const droppedCategory = droppedAnswers[item.text];
+                    return droppedCategory === item.correctCategory;
+                });
+            } else if (currentQuestion.type === "fill_in_the_blank") {
+                 const userAnswer = selectedAnswers || answeredQuestions[questionIndex];
+                 if (!userAnswer) return false;
+                 const normalizedUserAnswer = normalizeString(userAnswer);
+                 const normalizedCorrectAnswer = normalizeString(currentQuestion.answer);
+
+                 return normalizedUserAnswer === normalizedCorrectAnswer;
+            } else {
+                const correctAnswers = Array.isArray(currentQuestion.answer) ? currentQuestion.answer : [currentQuestion.answer];
+                if (!Array.isArray(selectedAnswers)) {
+                    selectedAnswers = selectedAnswers !== null ? [selectedAnswers] : [];
+                }
+                if (selectedAnswers.length !== correctAnswers.length) {
+                    return false;
+                }
+                selectedAnswers.sort();
+                correctAnswers.sort();
+                return JSON.stringify(selectedAnswers) === JSON.stringify(correctAnswers);
+            }
+        }
+        function showQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            questionCounter.textContent = `Câu hỏi: ${currentQuestionIndex + 1} / ${questions.length}`;
+            questionText.innerHTML = currentQuestion.question;
+            // ======= HIỂN THỊ HÌNH ẢNH MINH HỌA NẾU CÓ =======
+            const imageContainer = document.getElementById("question-image-container");
+            const imageElement = document.getElementById("question-image");
+            if (currentQuestion.image) {
+                imageElement.src = currentQuestion.image;
+                imageContainer.classList.remove("hidden");
+            } else {
+                imageContainer.classList.add("hidden");
+            }
+            optionsContainer.classList.add('hidden');
+            multiselectInfo.classList.add('hidden');
+            dragdropContainer.classList.add('hidden');
+            fillInTheBlankContainer.classList.add('hidden'); 
+            checkAnswerButton.classList.add('hidden'); 
+            if (currentQuestion.type === "drag_drop") {
+                renderDragDropUI(currentQuestion);
+                dragdropContainer.classList.remove('hidden');
+            } else if (currentQuestion.type === "fill_in_the_blank") {
+                renderFillInTheBlankUI(currentQuestion);
+                fillInTheBlankContainer.classList.remove('hidden');
+            } else {
+                renderSelectUI(currentQuestion);
+                optionsContainer.classList.remove('hidden');
+            }
+            nextButton.textContent = currentQuestionIndex >= questions.length - 1 ? "Hoàn thành bài thi" : "Câu tiếp theo";
+            updateButtonStates();
+            updateSidebarHighlight();
+        }
+        function renderSelectUI(currentQuestion) {
+            const isMulti = currentQuestion.type === "multi_select";
+            multiselectInfo.classList.toggle('hidden', !isMulti);
+            checkAnswerButton.classList.toggle('hidden', !isMulti); // Hiển thị nút kiểm tra chỉ cho Multi-Select
+            optionsContainer.innerHTML = '';
+            const savedAnswer = answeredQuestions[currentQuestionIndex];
+            const savedAnswersArray = Array.isArray(savedAnswer) ? savedAnswer : (savedAnswer !== null ? [savedAnswer] : []);
+            const isChecked = correctnessStatus[currentQuestionIndex] !== null;
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.innerHTML = option;
+                let classes = [
+                    "answer-button", "w-full", "py-3", "px-4", "rounded-xl", "text-center", 
+                    "bg-gray-100", "border-2", "border-gray-300", 
+                    "transition-all", "duration-200",
+                    "font-medium", "text-gray-800", "shadow-sm"
+                ];
+                button.classList.add(...classes);
+                if (isChecked) {
+                    button.disabled = true;
+                    button.classList.add("cursor-not-allowed");
+                    const correctAnswers = Array.isArray(currentQuestion.answer) ? currentQuestion.answer : [currentQuestion.answer];
+                    const isCorrectOption = correctAnswers.includes(option);
+                    const isUserSelected = savedAnswersArray.includes(option);
+                    if (isCorrectOption) {
+                        button.classList.add("bg-green-500", "text-white", "border-green-600");
+                        button.classList.remove("bg-gray-100", "border-gray-300");
+                    }
+                    if (isUserSelected && !isCorrectOption) {
+                        button.classList.add("bg-red-500", "text-white", "border-red-600");
+                        button.classList.remove("bg-green-500", "border-green-600", "bg-gray-100", "border-gray-300");
+                    }
+                } else {
+                    button.classList.add("hover:bg-blue-100", "hover:border-blue-500");
+                    if (isMulti) {
+                        button.addEventListener('click', (e) => {
+                            toggleSelection(e.currentTarget);
+                            updateButtonStates(); 
+                        });
+                    } else {
+                        button.addEventListener('click', (e) => singleSelectCheck(option, e.currentTarget));
+                    }
+                    if (savedAnswersArray.includes(option)) {
+                        button.classList.add('selected-option');
+                    }
+                }
+                optionsContainer.appendChild(button);
+            });
+        }
+        function renderFillInTheBlankUI(currentQuestion) {
+            const isChecked = correctnessStatus[currentQuestionIndex] !== null;
+            const savedAnswer = answeredQuestions[currentQuestionIndex] || "";
+            fillInTheBlankInput.value = savedAnswer;
+            fillInTheBlankInput.disabled = isChecked;
+            fillInTheBlankInput.classList.remove('correct', 'incorrect');
+            checkFillInTheBlankButton.classList.toggle('hidden', isChecked);
+            if (isChecked) {
+                const isCorrect = correctnessStatus[currentQuestionIndex];
+                fillInTheBlankInput.classList.add(isCorrect ? 'correct' : 'incorrect');
+                if (!isCorrect) {
+                     fillInTheBlankInput.placeholder = `Đáp án đúng: ${currentQuestion.answer}`;
+                }
+            } else {
+                fillInTheBlankInput.placeholder = "Nhập đáp án của bạn...";
+            }
+            updateButtonStates(); 
+        }
+        function checkFillInTheBlank() {
+            const userAnswer = fillInTheBlankInput.value.trim();
+            if (userAnswer === "") {
+                showMessage("Vui lòng nhập đáp án vào ô trống.", "yellow");
+                return;
+            }// 1. Lưu đáp án
+            answeredQuestions[currentQuestionIndex] = userAnswer;
+            checkAndApplyFeedback(currentQuestionIndex); 
+            fillInTheBlankInput.disabled = true;
+            checkFillInTheBlankButton.classList.add('hidden');
+            updateButtonStates(); 
+        }// --- Render Logic cho Drag & Drop ---
+        function renderDragDropUI(currentQuestion) {
+            draggableItemsSource.innerHTML = '';
+            dropTargetsContainer.innerHTML = '';
+            const savedDrops = answeredQuestions[currentQuestionIndex] || {};
+            const isChecked = correctnessStatus[currentQuestionIndex] !== null;
+            const itemsDataMap = new Map(currentQuestion.items.map(item => [item.text, item]));
+            checkAnswerButton.classList.remove('hidden');
+            const sourcePlaceholder = document.createElement('p');
+            sourcePlaceholder.classList.add('text-gray-500', 'text-sm', 'italic', 'w-full', 'source-placeholder');
+            draggableItemsSource.ondragover = allowDrop;
+            draggableItemsSource.ondragleave = dragLeave;
+            if (!isChecked) {
+                draggableItemsSource.ondrop = (e) => drop(e, null); 
+                sourcePlaceholder.textContent = 'Kéo các thẻ ở đây... (Kéo thẻ từ ô đáp án về đây để "kéo ra")'; 
+                sourcePlaceholder.classList.toggle('hidden', currentQuestion.items.length !== Object.keys(savedDrops).length);
+            } else {
+                draggableItemsSource.ondrop = null; // Vô hiệu hóa kéo/thả
+                sourcePlaceholder.textContent = 'Đã hoàn thành.';
+                sourcePlaceholder.classList.add('hidden'); 
+            }
+            draggableItemsSource.appendChild(sourcePlaceholder);
+            const dropZones = {};
+            currentQuestion.categories.forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.classList.add('bg-gray-50', 'p-4', 'rounded-xl', 'shadow-md', 'flex', 'flex-col');
+                const title = document.createElement('h3');
+                title.textContent = category;
+                title.classList.add('text-lg', 'font-bold', 'text-blue-700', 'mb-3', 'border-b', 'pb-2');
+                categoryDiv.appendChild(title);
+                const dropZone = document.createElement('div');
+                dropZone.classList.add('drop-zone', 'flex', 'flex-wrap', 'gap-2', 'p-3', 'rounded-lg', 'flex-grow');
+                dropZone.setAttribute('data-category', category);
+                if (!isChecked) {
+                    dropZone.ondragover = allowDrop;
+                    dropZone.ondragleave = dragLeave;
+                    dropZone.ondrop = (e) => drop(e, category); 
+                } else {
+                    dropZone.ondrop = null; 
+                    dropZone.style.cursor = 'default';
+                    const correctItemsForCategory = currentQuestion.items.filter(item => item.correctCategory === category);
+                    const droppedItems = Object.entries(savedDrops)
+                        .filter(([itemText, cat]) => cat === category)
+                        .map(([itemText]) => itemText);
+                    const correctlyPlacedCount = droppedItems.filter(text => itemsDataMap.get(text).correctCategory === category).length;
+                    const incorrectlyPlacedCount = droppedItems.length - correctlyPlacedCount;
+                    const missingCorrectCount = correctItemsForCategory.length - correctlyPlacedCount;
+                    if (incorrectlyPlacedCount > 0 || missingCorrectCount > 0) {
+                        dropZone.classList.add('incorrect-drop-zone');
+                    } else if (correctlyPlacedCount > 0 && incorrectlyPlacedCount === 0 && missingCorrectCount === 0) {
+                        dropZone.classList.add('correct-drop-zone');
+                    }
+                }
+                dropTargetsContainer.appendChild(categoryDiv).appendChild(dropZone);
+                dropZones[category] = dropZone;
+            });
+            currentQuestion.items.forEach(item => {
+                const itemEl = createDraggableItem(item, isChecked);
+                const droppedCategory = savedDrops[item.text];
+                if (droppedCategory) {
+                    const targetZone = dropZones[droppedCategory];
+                    if (targetZone) {
+                        targetZone.appendChild(itemEl);
+                    }
+                    if (isChecked) {
+                        const isCorrect = droppedCategory === item.correctCategory;
+                        itemEl.classList.remove('bg-white', 'border-gray-300');
+                        itemEl.classList.add('text-gray-900', 'shadow-md', 'ring-2');
+                        if (isCorrect) {
+                            itemEl.classList.add('bg-green-200', 'ring-green-500');
+                        } else {
+                            itemEl.classList.add('bg-red-200', 'ring-red-500');
+                            const correctHint = document.createElement('span');
+                            correctHint.textContent = `(Đúng: ${item.correctCategory})`;
+                            correctHint.classList.add('text-xs', 'text-red-700', 'mt-1', 'block', 'font-normal');
+                            itemEl.appendChild(correctHint);
+                        }
+                    }
+                } else {// Item chưa được thả -> Đặt vào vùng Source
+                    draggableItemsSource.appendChild(itemEl);
+                }
+            });// Ẩn placeholder Source nếu không còn item nào
+            const placeholder = draggableItemsSource.querySelector('.source-placeholder');
+            if (placeholder) placeholder.classList.toggle('hidden', currentQuestion.items.length === Object.keys(savedDrops).length);
+        }// Hàm tạo element cho thẻ kéo
+        function createDraggableItem(item, isChecked) {
+            const itemEl = document.createElement('div');
+            itemEl.id = item.id;
+            itemEl.textContent = item.text;
+            itemEl.classList.add(
+                'draggable-item', 'p-3', 'rounded-lg', 'shadow-sm', 'font-medium', 'text-sm', 'text-gray-800'
+            );
+            if (!isChecked) {
+                itemEl.setAttribute('draggable', 'true');
+                itemEl.ondragstart = drag;
+                itemEl.ondragend = dragEnd;
+            } else {
+                itemEl.setAttribute('draggable', 'false');
+                itemEl.style.cursor = 'default';
+            }
+            return itemEl;
+        }// --- Logic Xử lý Đáp án (Select) ---
+        function toggleSelection(button) {
+            button.classList.toggle('selected-option');
+        }
+        function singleSelectCheck(selectedOption, button) {
+            answeredQuestions[currentQuestionIndex] = selectedOption;
+            checkAndApplyFeedback(currentQuestionIndex);
+            renderSelectUI(questions[currentQuestionIndex]);
+            updateButtonStates();
+        }// Xử lý nút CHECK ANSWER (cho Multi-Select và Drag & Drop)
+        checkAnswerButton.addEventListener('click', () => {
+            const currentQuestion = questions[currentQuestionIndex];
+            if (currentQuestion.type === "multi_select") {
+                const allOptionButtons = optionsContainer.querySelectorAll('button');
+                const selectedOptions = Array.from(allOptionButtons)
+                    .filter(btn => btn.classList.contains('selected-option'))
+                    .map(btn => btn.textContent);
+                if (selectedOptions.length === 0) {
+                    showMessage("Vui lòng chọn ít nhất một đáp án trước khi kiểm tra.", "yellow");
+                    return;
+                }// Lưu đáp án và kiểm tra
+                answeredQuestions[currentQuestionIndex] = selectedOptions;
+                checkAndApplyFeedback(currentQuestionIndex);
+                renderSelectUI(questions[currentQuestionIndex]);
+            } else if (currentQuestion.type === "drag_drop") {
+                const droppedAnswers = answeredQuestions[currentQuestionIndex];
+                const isAllDropped = droppedAnswers !== null && droppedAnswers && Object.keys(droppedAnswers).length === currentQuestion.items.length;
+                if (!isAllDropped) {
+                    showMessage("Vui lòng kéo thả tất cả các thẻ vào vị trí trước khi kiểm tra.", "yellow");
+                    return;
+                }
+                checkAndApplyFeedback(currentQuestionIndex);
+                renderDragDropUI(questions[currentQuestionIndex]); // Render lại để hiển thị feedback
+            }
+            updateButtonStates();
+        });
+        // Hàm kiểm tra và áp dụng phản hồi
+        function checkAndApplyFeedback(questionIndex) {
+            const savedAnswer = answeredQuestions[questionIndex];
+            const isCorrect = checkCorrectness(questionIndex, savedAnswer);
+            const currentQuestionType = questions[questionIndex].type;
+            if (isCorrect) {
+                showMessage("🎉 Chúc mừng, đáp án chính xác!", "green");
+            } else {
+                if (currentQuestionType === "fill_in_the_blank") {
+                     showMessage(`Sai rồi. Đáp án đúng là: ${questions[questionIndex].answer}.`, "red");
+                } else if (currentQuestionType === "drag_drop") {
+                     showMessage(`Sai rồi. Đáp án kéo thả chưa hoàn toàn chính xác. Vui lòng xem phản hồi màu sắc!`, "red");
+                } else {
+                     showMessage("Sai rồi. Vui lòng xem lại kết quả (Màu xanh lá là đúng, đỏ là sai)!", "red");
+                }
+            }
+            correctnessStatus[questionIndex] = isCorrect;
+            // Xử lý feedback cho Fill-in-the-Blank (cần gọi lại renderFillInTheBlankUI để update placeholder)
+            if (currentQuestionType === "fill_in_the_blank") {
+                renderFillInTheBlankUI(questions[questionIndex]);
+            }
+            updateSidebarHighlight(); // Cập nhật màu sắc trên sidebar
+            return isCorrect;
+        }
+        function updateButtonStates() {
+            const currentQuestion = questions[currentQuestionIndex];
+            const isChecked = correctnessStatus[currentQuestionIndex] !== null;
+            nextButton.disabled = !isChecked;
+            nextButton.classList.toggle('bg-gray-200', !isChecked);
+            nextButton.classList.toggle('text-gray-800', !isChecked);
+            nextButton.classList.toggle('enabled-next', isChecked);
+            if (currentQuestion.type === "multi_select" || currentQuestion.type === "drag_drop") {
+                checkAnswerButton.classList.toggle('hidden', isChecked);
+                if (!isChecked) {
+                    let isAnswered = false;
+                    if (currentQuestion.type === "drag_drop") {
+                        const droppedAnswers = answeredQuestions[currentQuestionIndex];
+                        isAnswered = droppedAnswers !== null && droppedAnswers && Object.keys(droppedAnswers).length === currentQuestion.items.length;
+                    } else if (currentQuestion.type === "multi_select") {
+                        const currentSelections = optionsContainer.querySelectorAll('.selected-option').length;
+                        isAnswered = currentSelections > 0;
+                    }
+                    checkAnswerButton.disabled = !isAnswered;
+                    checkAnswerButton.classList.toggle('check-button-enabled', isAnswered);
+                    checkAnswerButton.classList.toggle('check-button-disabled', !isAnswered);
+                }
+            }// 3. Logic cho nút CHECK FILL-IN-THE-BLANK
+            if (currentQuestion.type === "fill_in_the_blank") {
+                if (!isChecked) {
+                    const isAnswered = fillInTheBlankInput.value.trim() !== "";
+                    checkFillInTheBlankButton.disabled = !isAnswered;
+                    checkFillInTheBlankButton.classList.toggle('check-button-enabled', isAnswered);
+                    checkFillInTheBlankButton.classList.toggle('check-button-disabled', !isAnswered);
+                    fillInTheBlankInput.oninput = updateButtonStates; 
+                }
+            }
+        }
+        nextButton.addEventListener('click', nextQuestion);
+        function nextQuestion() {
+            if (correctnessStatus[currentQuestionIndex] === null) {
+                const currentType = questions[currentQuestionIndex].type;
+                if (currentType === "multi_select" || currentType === "drag_drop" || currentType === "fill_in_the-blank") {
+                    showMessage("Vui lòng nhấn nút 'Kiểm tra đáp án' trước khi chuyển câu.", "yellow");
+                    return;
+                }
+            }// Chuyển sang câu tiếp theo (hoặc hoàn thành bài thi)
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+        function jumpToQuestion(index) {
+            currentQuestionIndex = index;
+            showQuestion();
+        }
+        function goToStartScreen() {
+            clearInterval(timerInterval);
+            elapsedTime = 0; 
+            timerDisplay.textContent = "00:00"; // Đặt lại đồng hồ hiển thị
+            quizContent.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            sidebar.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        }
+        function showResults() {
+            clearInterval(timerInterval);
+            quizContent.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+            
+            const totalCorrect = correctnessStatus.filter(status => status === true).length;
+            const totalQuestions = questions.length;
+            // TỐI ƯU HÓA TÍNH ĐIỂM: Cập nhật thẻ hiển thị điểm số
+            finalScore.textContent = `${totalCorrect} / ${totalQuestions}`;
+            if (totalCorrect === totalQuestions) {
+                resultMessage.textContent = `Bạn đã trả lời đúng ${totalCorrect} / ${totalQuestions} câu. Xin chúc mừng! Bạn đạt kết quả tuyệt đối.`;
+            } else {
+                resultMessage.textContent = `Bạn đã trả lời đúng ${totalCorrect} / ${totalQuestions} câu. Hãy xem lại các câu trả lời của mình trên giao diện nhé.`;
+            }
+            sidebar.classList.add('hidden');
+        }
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            answeredQuestions = new Array(questions.length).fill(null);
+            correctnessStatus = new Array(questions.length).fill(null);
+            resultsScreen.classList.add('hidden');
+            quizContent.classList.remove('hidden');
+            sidebar.classList.remove('hidden'); 
+            startTimer();
+            createQuestionList(); 
+            showQuestion();
+        }
+        function startTimer() {
+            clearInterval(timerInterval); 
+            timerInterval = setInterval(() => {
+                elapsedTime++;
+                const minutes = Math.floor(elapsedTime / 60);
+                const seconds = elapsedTime % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        function createQuestionList() {
+            questionListContainer.innerHTML = '';
+            questions.forEach((q, index) => {
+                const button = document.createElement('button');
+                button.textContent = index + 1;
+                button.classList.add(
+                    "w-8", "h-8", "rounded-full", "font-medium", "text-sm",
+                    "bg-gray-200", "text-gray-800", "hover:bg-blue-200",
+                    "transition-colors", "duration-200"
+                );
+                button.setAttribute('data-index', index);
+                button.addEventListener('click', () => {
+                    jumpToQuestion(index);
+                });
+                questionListContainer.appendChild(button);
+            });
+        }
+        function updateSidebarHighlight() {
+            const allQuestionButtons = questionListContainer.querySelectorAll('button');
+            allQuestionButtons.forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white', 'bg-green-500', 'bg-red-500', 'bg-yellow-400');
+                const index = parseInt(btn.getAttribute('data-index'));
+                if (index === currentQuestionIndex) {
+                    btn.classList.add('bg-blue-600', 'text-white');
+                } else if (correctnessStatus[index] === true) {
+                    btn.classList.add('bg-green-500', 'text-white');
+                } else if (correctnessStatus[index] === false) {
+                    btn.classList.add('bg-red-500', 'text-white');
+                } else if (answeredQuestions[index] !== null) {
+                    btn.classList.add('bg-yellow-400', 'text-white');
+                }
+            });
+        }
+        function showMessage(text, color) {
+            const existingMessage = quizContent.querySelector('.temp-message');
+            if (existingMessage) existingMessage.remove();
+            const colorClasses = {
+                "yellow": "bg-yellow-100 border-yellow-400 text-yellow-700",
+                "red": "bg-red-100 border-red-400 text-red-700",
+                "green": "bg-green-100 border-green-400 text-green-700"
+            };
+            const messageBox = document.createElement('div');
+            messageBox.textContent = text;
+            const colorClassString = colorClasses[color] || colorClasses['yellow'];
+            messageBox.classList.add(
+                ...colorClassString.split(' '), 
+                "border", "px-4", "py-3", "rounded", "relative", "mb-4", "temp-message"
+            );
+            quizContent.insertBefore(messageBox, questionCounter.nextElementSibling);
+            setTimeout(() => messageBox.remove(), 3000); 
+        }// --- Hàm XÁO TRỘN MẢNG (Fisher-Yates Shuffle) ---
+        function shuffleArray(array) {
+            let shuffled = array.slice(); // Tạo bản sao để không ảnh hưởng đến dữ liệu gốc
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }// --- Khởi tạo sự kiện ---
+        startButton.addEventListener('click', () => {
+            // Đảm bảo reset trạng thái trước khi bắt đầu
+            currentQuestionIndex = 0;
+            answeredQuestions = new Array(questions.length).fill(null);
+            correctnessStatus = new Array(questions.length).fill(null);
+            // questions = shuffleArray(questions); // Xáo trộn câu hỏi
+            startScreen.classList.add('hidden');
+            quizContent.classList.remove('hidden');
+            sidebar.classList.remove('hidden');
+            createQuestionList();
+            startTimer();
+            showQuestion();
+        });
+        restartButton.addEventListener('click', restartQuiz);
+        exitButton.addEventListener('click', () => {
+            showMessage("Đã thoát khỏi bài kiểm tra. Dữ liệu làm bài hiện tại sẽ không được lưu. Đang quay về màn hình bắt đầu...", "red");
+            setTimeout(goToStartScreen, 1000);
+        });
+    </script>
+</body>
+</html>
